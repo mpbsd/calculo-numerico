@@ -5,7 +5,7 @@ from copy import deepcopy
 from functools import reduce
 
 
-def dimensions(A: list[list]) -> tuple[int]:  # {{{
+def dimensions(A: list[list[float]]) -> tuple[int]:  # {{{
     m1 = None
     m2 = None
     b1 = 0
@@ -29,7 +29,7 @@ def dimensions(A: list[list]) -> tuple[int]:  # {{{
     return (m1, m2)  # }}}
 
 
-def pmatrix(A: list[list]) -> None:  # {{{
+def pmatrix(A: list[list[float]]) -> None:  # {{{
     m1, m2 = dimensions(A)
     if (m1 is not None) and (m2 is not None):
         if m2 == 1:
@@ -46,7 +46,7 @@ def pmatrix(A: list[list]) -> None:  # {{{
                         print("%+12.6f" % A[i][j], end="\t")  # }}}
 
 
-def psystem(A: list[list], b: list[list]) -> None:  # {{{
+def psystem(A: list[list[float]], b: list[list[float]]) -> None:  # {{{
     m1, m2 = dimensions(A)
     n1, n2 = dimensions(b)
     c0 = m1 is not None
@@ -68,7 +68,9 @@ def psystem(A: list[list], b: list[list]) -> None:  # {{{
                     print("%+12.6f" % A[i][j], end="\t")  # }}}
 
 
-def matrix_product(A1: list[list], A2: list[list]) -> list[list]:  # {{{
+def matrix_product(  # {{{
+    A1: list[list[float]], A2: list[list[float]]
+) -> list[list[float]]:
     A3 = None
     m1, m2 = dimensions(A1)
     n1, n2 = dimensions(A2)
@@ -91,7 +93,9 @@ def matrix_product(A1: list[list], A2: list[list]) -> list[list]:  # {{{
     return A3  # }}}
 
 
-def matrix_sum(A1: list[list], A2: list[list]) -> list[list]:  # {{{
+def matrix_sum(  # {{{
+    A1: list[list[float]], A2: list[list[float]]
+) -> list[list[float]]:
     A3 = None
     m1, m2 = dimensions(A1)
     n1, n2 = dimensions(A2)
@@ -106,7 +110,9 @@ def matrix_sum(A1: list[list], A2: list[list]) -> list[list]:  # {{{
     return A3  # }}}
 
 
-def scalar_times_matrix(a: float, A: list[list]) -> list[list]:  # {{{
+def scalar_times_matrix(  # {{{
+    a: float, A: list[list[float]]
+) -> list[list[float]]:
     B = None
     m1, m2 = dimensions(A)
     c0 = m1 is not None
@@ -116,12 +122,12 @@ def scalar_times_matrix(a: float, A: list[list]) -> list[list]:  # {{{
     return B  # }}}
 
 
-def matrix_transpose(A: list[list]) -> list[list]:  # {{{
+def matrix_transpose(A: list[list[float]]) -> list[list[float]]:  # {{{
     m1, m2 = dimensions(A)
     return [[A[j][i] for j in range(m2)] for i in range(m1)]  # }}}
 
 
-def lu_decomposition(A: list[list]) -> tuple[list[list]]:  # {{{
+def lu_decomposition(A: list[list[float]]) -> tuple[list[list[float]]]:  # {{{
     P = None
     L = None
     U = None
@@ -134,28 +140,41 @@ def lu_decomposition(A: list[list]) -> tuple[list[list]]:  # {{{
         L = [[(1 if i == j else 0) for j in range(m1)] for i in range(m1)]
         U = deepcopy(A)
         for i in range(m1 - 1):
-            p, M = sorted(
-                [(k, abs(U[k][i])) for k in range(m1)],
-                key=lambda t: t[1],
-                reverse=True,
-            )[0]
-            if p != i:
-                U[p], U[i] = U[i], U[p]
-                P[p], P[i] = P[i], P[p]
-            if M == 0:
-                M = 1
-            else:
-                M = U[i][i]
+            p = i
+            m = U[p][i]
             for k in range(i + 1, m1):
-                L[k][i] = U[k][i] / M
-                for l in range(i, m1):
-                    U[k][l] -= L[k][i] * U[i][l]
+                if abs(U[k][i]) > abs(m):
+                    k = i
+                    m = U[k][i]
+            if p != i:
+                U[i], U[p] = U[p], U[i]
+                P[i], P[p] = P[p], P[i]
+            for k in range(i + 1, m1):
+                if U[i][i] != 0:
+                    L[k][i] = U[k][i] / U[i][i]
+                    for l in range(i, m1):
+                        U[k][l] -= L[k][i] * U[i][l]
     return P, L, U  # }}}
 
 
 def main():
-    A = [[1, 2, 3, 0], [0, 4, 5, 6], [7, -1, 8, 9], [0, -1, 1, 2]]
-    b = [[43], [0], [-1], [3.141592]]
+    # A = [[1, 2], [3, 4]]
+    # b = [[1], [2]]
+
+    # A = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+    # b = [[1], [2], [3]]
+
+    # A = [[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 16]]
+    # b = [[1], [2], [3], [4]]
+
+    A = [
+        [10, 11, 12, 13, 14],
+        [15, 16, 17, 18, 19],
+        [20, 21, 22, 23, 24],
+        [25, 26, 27, 28, 29],
+        [30, 31, 32, 33, 34],
+    ]
+    b = [[1], [2], [3], [4], [5]]
 
     print("\nAX=b:")
     psystem(A, b)
@@ -171,11 +190,10 @@ def main():
     print("\nU:")
     pmatrix(U)
 
-    print("\nPA:")
-    pmatrix(matrix_product(P, A))
-
-    print("\nLU:")
-    pmatrix(matrix_product(L, U))
+    print("\nPA-LU:")
+    PA = matrix_product(P, A)
+    LU = matrix_product(L, U)
+    pmatrix(matrix_sum(PA, scalar_times_matrix(-1, LU)))
 
 
 if __name__ == "__main__":
