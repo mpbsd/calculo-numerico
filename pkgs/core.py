@@ -127,7 +127,7 @@ def matrix_transpose(A: list[list[float]]) -> list[list[float]]:  # {{{
     return [[A[j][i] for j in range(m2)] for i in range(m1)]  # }}}
 
 
-def lu_decomposition(A: list[list[float]]) -> tuple[list[list[float]]]:  # {{{
+def lu_decomposition(A: list[list[float]]) -> tuple[list[list[float]]]:
     P = None
     L = None
     U = None
@@ -136,33 +136,32 @@ def lu_decomposition(A: list[list[float]]) -> tuple[list[list[float]]]:  # {{{
     c1 = m2 is not None
     c2 = m1 == m2
     if c0 and c1 and c2:
-        P = [[(1 if i == j else 0) for j in range(m1)] for i in range(m1)]
-        L = [[(1 if i == j else 0) for j in range(m1)] for i in range(m1)]
+        P = [[(1 if j == i else 0) for j in range(m1)] for i in range(m1)]
+        L = [[(1 if j == i else 0) for j in range(m1)] for i in range(m1)]
         U = deepcopy(A)
-        for i in range(m1 - 1):
-            p = i
-            m = U[p][i]
-            for k in range(i + 1, m1):
-                if abs(U[k][i]) > abs(m):
-                    p = k
-                    m = U[p][i]
-            if p != i:
-                U[i], U[p] = U[p], U[i]
-                P[i], P[p] = P[p], P[i]
-            for k in range(i + 1, m1):
-                if U[i][i] != 0:
-                    L[k][i] = U[k][i] / U[i][i]
-                    for l in range(i, m1):
-                        U[k][l] -= L[k][i] * U[i][l]
-    return P, L, U  # }}}
+        for k in range(m1):
+            p = k
+            m = U[p][k]
+            for i in range(k, m1):
+                if abs(U[i][k]) > abs(m):
+                    p = i
+                    m = U[p][k]
+            if p != k:
+                U[k], U[p] = U[p], U[k]
+                P[k], P[p] = P[p], P[k]
+            for i in range(k + 1, m1):
+                if U[k][k] != 0:
+                    L[i][k] = U[i][k] / U[k][k]
+                for j in range(k, m1):
+                    U[i][j] -= L[i][k] * U[k][j]
+    return P, L, U
 
 
 def main():
     A = [[1, -3, 2], [-2, 8, -1], [4, -6, 5]]
-    b = [[11], [-15], [29]]
 
-    print("\nAX=b:")
-    psystem(A, b)
+    print("\nA:")
+    pmatrix(A)
 
     P, L, U = lu_decomposition(A)
 
@@ -174,11 +173,6 @@ def main():
 
     print("\nU:")
     pmatrix(U)
-
-    print("\nPA-LU:")
-    PA = matrix_product(P, A)
-    LU = matrix_product(L, U)
-    pmatrix(matrix_sum(PA, scalar_times_matrix(-1, LU)))
 
 
 if __name__ == "__main__":
