@@ -6,8 +6,9 @@
 #define N 3
 
 void allocate(double ***);
+void setfree(double **);
 void init(double **, double **, double **, double **);
-void display(double **, char*);
+void display(double **, char *);
 void plu(double **, double **, double **);
 
 int main(void) {
@@ -40,15 +41,15 @@ int main(void) {
   display(L, "L");
   display(U, "U");
 
-  free(A);
-  free(P);
-  free(L);
-  free(U);
+  setfree(A);
+  setfree(P);
+  setfree(L);
+  setfree(U);
 
   exit(EXIT_SUCCESS);
 }
 
-void allocate(double ***A) {/*{{{*/
+void allocate(double ***A) { /*{{{*/
   int i = 0;
 
   *A = malloc(N * sizeof(malloc(N * sizeof(double))));
@@ -56,9 +57,19 @@ void allocate(double ***A) {/*{{{*/
   for (i = 0; i < N; ++i) {
     (*A)[i] = malloc(N * sizeof(double));
   }
-}/*}}}*/
+} /*}}}*/
 
-void init(double **A, double **P, double **L, double **U) {/*{{{*/
+void setfree(double **A) { /*{{{*/
+  int i = 0;
+
+  for (i = 0; i < N; ++i) {
+    free(A[i]);
+  }
+
+  free(A);
+} /*}}}*/
+
+void init(double **A, double **P, double **L, double **U) { /*{{{*/
   int i = 0;
   int j = 0;
 
@@ -69,9 +80,9 @@ void init(double **A, double **P, double **L, double **U) {/*{{{*/
       U[i][j] = A[i][j];
     }
   }
-}/*}}}*/
+} /*}}}*/
 
-void display(double **A, char *label) {/*{{{*/
+void display(double **A, char *label) { /*{{{*/
   int i = 0;
   int j = 0;
 
@@ -83,9 +94,9 @@ void display(double **A, char *label) {/*{{{*/
     }
     printf("]\n");
   }
-}/*}}}*/
+} /*}}}*/
 
-void plu(double **P, double **L, double **U) {/*{{{*/
+void plu(double **P, double **L, double **U) { /*{{{*/
   int i = 0;
   int j = 0;
   int k = 0;
@@ -118,4 +129,4 @@ void plu(double **P, double **L, double **U) {/*{{{*/
       }
     }
   }
-}/*}}}*/
+} /*}}}*/

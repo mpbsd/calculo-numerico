@@ -12,6 +12,9 @@ black:
 clang:
 	$(CC) $(CFLAGS) $(CLIBS) pkgs/main.c -o main.o && ./main.o
 
+chase:
+	valgrind --leak-check=full --show-leak-kinds=all ./main.o
+
 clean:
 	find . -type d -name __pycache__ -delete
 	find bin -type f -name "*.o" -delete
