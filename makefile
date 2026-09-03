@@ -1,11 +1,11 @@
 CC     = cc
-CFLAGS = -g -W -Wall -Wextra -Wpedantic -std=c89
 CLIBS  = -lc
+CFLAGS = -g -W -Wall -Werror -Wextra -Wpedantic -std=c89
 
-build:
-	$(CC) $(CFLAGS) $(CLIBS) src/main.c -o bin/main.o
-
-clean:
+clear:
 	find bin -type f -name "*.o" -delete
 
-.PHONY: clean
+%:
+	$(CC) $(CLIBS) $(CFLAGS) src/$@.c -o bin/$@.o
+
+.PHONY: clear
