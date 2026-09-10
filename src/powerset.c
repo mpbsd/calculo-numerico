@@ -48,7 +48,7 @@ void allocate(int**** powerset, int n)
   int j;
   int b;
 
-  (*powerset) = malloc((n + 1) * sizeof(int***));
+  *powerset = malloc((n + 1) * sizeof(int***));
 
   for (i = 0; i <= n; ++i) {
     b = binomial(n, i);
