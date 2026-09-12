@@ -1,10 +1,5 @@
 #include "matrix.h"
 
-#define MAX(X, Y) ((X) >= (Y) ? (X) : (Y))
-#define ABS(X) (MAX(-1.0 * (X), (X)))
-
-double decompose(double** A, double*** P, double*** L, double*** U, int n);
-
 int main(void)
 {
   int N = 4;
@@ -65,79 +60,4 @@ int main(void)
   deallocate(&S, N);
 
   exit(EXIT_SUCCESS);
-}
-
-double decompose(double** A, double*** P, double*** L, double*** U, int n)
-{
-  int i;
-  int j;
-  int k;
-  int p;
-  int* pivot = NULL;
-  double** B = NULL;
-  double d = 1.0;
-  double m;
-  double r;
-  double t;
-
-  pivot = malloc(n * sizeof(int));
-  allocate(&B, n);
-
-  for (i = 0; i <= n - 1; i++) {
-    pivot[i] = i;
-    for (j = 0; j <= n - 1; j++) {
-      B[i][j] = A[i][j];
-    }
-  }
-
-  for (j = 0; j <= n - 1; j++) {
-    p = j;
-    m = ABS(B[j][j]);
-    for (k = j + 1; k <= n - 1; k++) {
-      if (ABS(B[k][j]) > m) {
-        m = ABS(B[k][j]);
-        p = k;
-      }
-    }
-    if (p != j) {
-      for (k = 0; k <= n - 1; k++) {
-        t = B[j][k];
-        B[j][k] = B[p][k];
-        B[p][k] = t;
-      }
-      i = pivot[j];
-      pivot[j] = pivot[p];
-      pivot[p] = i;
-      d *= -1.0;
-    }
-    d *= B[j][j];
-    if (ABS(B[j][j]) != 0) {
-      r = 1.0 / B[j][j];
-      for (i = j + 1; i <= n - 1; i++) {
-        m = B[i][j] * r;
-        B[i][j] = m;
-        for (k = j + 1; k <= n - 1; k++) {
-          B[i][k] = B[i][k] - m * B[j][k];
-        }
-      }
-    }
-  }
-
-  for (i = 0; i <= n - 1; i++) {
-    for (j = 0; j <= n - 1; j++) {
-      (*P)[i][j] = (i == pivot[j]) ? 1.0 : 0.0;
-      if (i <= j) {
-        (*L)[i][j] = (i == j) ? 1.0 : 0.0;
-        (*U)[i][j] = B[i][j];
-      } else {
-        (*L)[i][j] = B[i][j];
-        (*U)[i][j] = 0.0;
-      }
-    }
-  }
-
-  free(pivot);
-  deallocate(&B, n);
-
-  return d;
 }
