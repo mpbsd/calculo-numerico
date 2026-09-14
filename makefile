@@ -1,7 +1,7 @@
 CC      = cc
 CLIBS   = -lc
-INCLUDE = -Ilib
 CFLAGS  = -g -W -Wall -Werror -Wextra -Wpedantic -std=c89
+INCLUDE = -Ilib
 SOURCES = lib/matrix.c
 
 clear:
